@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <title>Detalhes do Pokémon</title>
+    <link rel="stylesheet" href="infos.css">
+    <link rel="icon" href="images/pok.ico">
+</head>
+
+<body>
+    <header>
+        <img src="images/R (1).png" alt="poke_logo" width="400px">
+        <button id="btncu" onclick="navigateToHome()">Go to <strong>HOME</strong></button>
+    </header>
+
+    <div id="pokemon-details">
+        <div id="img-container">
+            <img id="front-image" alt="Front Image">
+            <img id="back-image" alt="Back Image">
+        </div>
+
+        <div id="info-container">
+            <div id="types-container"></div>
+            <div id="stats-container"></div>
+            <div id="moves-container"></div>
+        </div>
+    </div>
+
+    <script>
+        function navigateToHome() {
+            window.location.href = "home.html";
+        }
+
+        function displayPokemonDetails() {
+            const params = new URLSearchParams(window.location.search);
+            const pokemonName = params.get('name');
+            const pokemonId = params.get('id');
+
+            if (!pokemonName || !pokemonId) {
+                console.error('Nome ou ID do Pokémon não fornecidos.');
+                return;
+            }
+
+            fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const frontImage = document.getElementById('front-image');
+                    frontImage.src = data.sprites.front_default;
+
+                    const backImage = document.getElementById('back-image');
+                    backImage.src = data.sprites.back_default;
+
+                    const statsContainer = document.getElementById('stats-container');
+                    const pStats = document.createElement('p');
+                    pStats.textContent = `Stats: ${data.stats.map(stat => `${stat.stat.name}: ${stat.base_stat}`).join(', ')}`;
+                    statsContainer.appendChild(pStats);
+
+                    const typesContainer = document.getElementById('types-container');
+                    const pTypes = document.createElement('p');
+                    pTypes.textContent = `Tipos: ${data.types.map(type => type.type.name).join(', ')}`;
+                    typesContainer.appendChild(pTypes);
+
+                    const movesContainer = document.getElementById('moves-container');
+                    const pMoves = document.createElement('p');
+                    pMoves.textContent = `Movimentos: ${data.moves.map(move => move.move.name).join(', ')}`;
+                    movesContainer.appendChild(pMoves);
+                })
+                .catch(err => console.log("Erro ao obter detalhes do Pokémon: " + err));
+        }
+
+        displayPokemonDetails();
+    </script>
+</body>
+
+</html>

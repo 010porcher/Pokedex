@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <title>HOME PAGE POKÉDEX</title>
+    <link rel="stylesheet" href="home.css">
+    <link rel="icon" href="images/charizard.ico">
+</head>
+
+<body>
+    <header>
+        <img src="images/R (1).png" alt="poke_logo" width="400px">
+        <button id="btncu" onclick="navigateToPokedex()">Go to <strong>POKÉDEX</strong></button>
+    </header>
+
+    <div id="lista"></div>
+
+    <script>
+        let pokedexList = JSON.parse(localStorage.getItem('pokedexList')) || [];
+
+        function navigateToPokedex() {
+            localStorage.setItem('pokedexList', JSON.stringify(pokedexList));
+            window.location.href = 'pokedex.html';
+        }
+
+        function navigateToDetails(name, id) {
+            window.location.href = `infos.html?name=${name}&id=${id}`;
+        }
+
+        fetch("https://pokeapi.co/api/v2/pokemon/")
+            .then(response => response.json())
+            .then(function (data) {
+                console.log(data);
+                let lista = document.getElementById("lista");
+                data.results.forEach(function (pokemon, index) {
+                    let divPokemon = document.createElement("div");
+                    divPokemon.classList.add("pokemon");
+
+                    let pName = document.createElement("p");
+                    pName.textContent = `Nome: ${pokemon.name}`;
+
+                    let btnDetails = document.createElement('button');
+                    btnDetails.textContent = 'Detalhes';
+                    btnDetails.onclick = function () {
+                        navigateToDetails(pokemon.name, index + 1);
+                    };
+
+                    let btnAddPokedex = document.createElement("button");
+                    btnAddPokedex.textContent = "Adicionar à Pokédex";
+                    btnAddPokedex.onclick = function () {
+                        addToPokedex(pokemon.name, index);
+                        console.log(`Adicionar ${pokemon.name} à Pokedex`);
+                        divPokemon.style.display = 'none'; 
+                    };
+
+                    divPokemon.appendChild(pName);
+                    divPokemon.appendChild(btnDetails);
+                    divPokemon.appendChild(btnAddPokedex);
+
+                    lista.appendChild(divPokemon);
+                });
+            })
+            .catch(err => console.log("Erro: " + err));
+
+        function addToPokedex(name, index) {
+            if (!pokedexList.some(pokemon => pokemon.name === name)) {
+                pokedexList.push({ name, id: index + 1 });
+            } else {
+                console.log(`${name} já está na Pokédex!`);
+            }
+        }
+    </script>
+</body>
+
+</html>

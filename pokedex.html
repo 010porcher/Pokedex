@@ -1,0 +1,82 @@
+<!-- pokedex.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <title>POKÉDEX</title>
+    <link rel="stylesheet" href="home.css">
+    <link rel="icon" href="images/R-_1_.ico">
+    <header>
+        <img src="images/R (1).png" alt="poke_logo" width="400px">
+        <button id="btncu" onclick="navigateToHome()">Go to <strong>HOME</strong></button>
+    </header>
+</head>
+
+<body>
+    <div id="pokedex-list"></div>
+
+    <script>
+        function navigateToHome() {
+            window.location.href = "home.html";
+        }
+
+        function navigateToDetails(name, id) {
+            window.location.href = `infos.html?name=${name}&id=${id}`;
+        }
+
+        function getPokedexList() {
+            const pokedexList = JSON.parse(localStorage.getItem('pokedexList')) || [];
+            return pokedexList;
+        }
+
+        function savePokedexList(pokedexList) {
+            localStorage.setItem('pokedexList', JSON.stringify(pokedexList));
+        }
+
+        function displayPokedexList() {
+            const pokedexList = getPokedexList();
+            const pokedexContainer = document.getElementById('pokedex-list');
+
+            pokedexList.forEach(pokemon => {
+                let pokedexItem = document.createElement('div');
+                pokedexItem.classList.add('pokemon');
+
+                let pName = document.createElement('p');
+                pName.textContent = `Nome: ${pokemon.name}`;
+
+                let pId = document.createElement('p');
+                pId.textContent = `ID: ${pokemon.id}`;
+
+                let btnDetails = document.createElement('button');
+                btnDetails.textContent = 'Detalhes';
+                btnDetails.onclick = function () {
+                    navigateToDetails(pokemon.name, pokemon.id);
+                };
+
+                let btnRemove = document.createElement('button');
+                btnRemove.textContent = 'Remover';
+                btnRemove.onclick = function () {
+                    removeFromPokedex(pokemon.id);
+                    pokedexContainer.removeChild(pokedexItem); 
+                };
+
+                pokedexItem.appendChild(pName);
+                pokedexItem.appendChild(pId);
+                pokedexItem.appendChild(btnDetails);
+                pokedexItem.appendChild(btnRemove);
+
+                pokedexContainer.appendChild(pokedexItem);
+            });
+        }
+
+        function removeFromPokedex(id) {
+            const pokedexList = getPokedexList();
+            const updatedPokedexList = pokedexList.filter(pokemon => pokemon.id !== id);
+            savePokedexList(updatedPokedexList);
+        }
+
+        displayPokedexList();
+    </script>
+</body>
+
+</html>
